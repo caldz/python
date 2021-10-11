@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="icon">
+    <file>images/IC.png</file>
+    <file>images/iD.png</file>
+    <file>images/waon.png</file>
+  </qresource>
+</RCC>
