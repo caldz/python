@@ -1,1 +1,3 @@
 #本文件用来设置工程GIT屏蔽文件
+.svn
+py_release

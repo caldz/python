@@ -1,0 +1,3 @@
+如果VMC比CCV-的MDB应用先启动，
+CCV握手序列异常：
+那么CCV-MDB在握手时会重复回复JUST RESET指令，
