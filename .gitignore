@@ -2,3 +2,4 @@
 .svn
 py_release
 __pychache__/
+__pychache__
