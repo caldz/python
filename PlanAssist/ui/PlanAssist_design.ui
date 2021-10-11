@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>plan_assist_main</class>
+ <widget class="QWidget" name="plan_assist_main">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>587</width>
+    <height>504</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PlanAssist</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <widget class="QCalendarWidget" name="win_calendar"/>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>任务</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>任务列表</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PATaskList" name="win_task_list"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>任务明细</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PATaskDetailList" name="win_task_detail_list"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>项目</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>项目列表</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PAProjectList" name="win_project_list"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>项目明细</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PAProjectDetailList" name="win_project_detail_list"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PATaskDetailList</class>
+   <extends>QListWidget</extends>
+   <header>PATaskDetailList</header>
+  </customwidget>
+  <customwidget>
+   <class>PATaskList</class>
+   <extends>QListWidget</extends>
+   <header>PATaskList</header>
+  </customwidget>
+  <customwidget>
+   <class>PAProjectDetailList</class>
+   <extends>QListWidget</extends>
+   <header>PAProjectDetailList</header>
+  </customwidget>
+  <customwidget>
+   <class>PAProjectList</class>
+   <extends>QListWidget</extends>
+   <header>PAProjectList</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
