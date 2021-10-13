@@ -1,0 +1,48 @@
+#建表
+create table 任务列表(
+	名称 text primary key not null,
+	状态 text,
+	累计时间 timestamp,
+	开始时间 datetime,
+	结束时间 datetime,
+	计划开始时间 datetime,
+	计划结束时间 datetime
+);
+
+#删除表格
+drop table 任务列表;
+
+#查询表格
+select * from 任务列表;
+
+#插入数据
+insert into 任务列表(名称,计划开始时间,计划结束时间) values('无屏幕EDC开发',datetime('now'),datetime('now','+14 days'));
+insert into 任务列表(名称,计划开始时间,计划结束时间) values('IM10_EDC开发',datetime('now'),datetime('now','+14 days'));
+insert into 任务列表(名称,计划开始时间,计划结束时间) values('技术分享',datetime('now','+2 days'),datetime('now','+14 days'));
+
+#删除数据
+delete from 任务列表 where 名称='无屏幕EDC';
+
+#更新数据
+update 任务列表 set 开始时间=datetime('now') where 名称='无屏幕EDC';
+update 任务列表 set 状态='激活' where 名称='无屏幕EDC';
+update 任务列表 set 状态='停止' where 名称='IM10_EDC开发';
+update 任务列表 set 状态=NULL where 名称='技术分享';
+update 任务列表 set 计划结束时间=datetime('now','+7 days') where 名称='技术分享';
+
+
+#sqlite工具内置命令===================================
+#查询表格
+.tables
+#查询表格结构
+.schema
+#退出sqlite工具
+.exit
+
+
+
+
+#注意事项=========================================
+python3 sqlite3中文调试：
+只要处理得当，可以支持全中文数据库（字段，表值都为中文）
+要注意终端有可能会把中文转成终端本身的中文编码，哪怕SQLITE3工具处于UTF-8编码模式

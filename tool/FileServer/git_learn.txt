@@ -1,0 +1,36 @@
+仓库地址】
+https://github.com/caldz/FileServer.git
+
+初始化仓库】
+git init
+
+关联仓库地址】
+git remote add origin https://github.com/caldz/python.git
+
+创建SSH指令】
+ssh-keygen -t rsa -C "136820607@qq.com"
+
+添加指令】
+git add xxx
+
+提交指令】
+git commit -a -m "update"
+
+上传指令】
+git push https://github.com/caldz/python.git
+
+同步指令】有时候需要先同步才能上传
+git pull
+
+拉取远程代码】
+git clone https://github.com/caldz/python.git
+
+查询信息】
+git config -l
+
+解决SSL报错方案】
+git config --global http.sslBackend "openssl"
+git config --global http.sslCAInfo "E:\software\tool\fileManager\Git\mingw64\ssl\cert.pem"
+使用代理的时候需要设置一下代理)
+git config --global http.proxy 127.0.0.1:7890
+git config --global https.proxy 127.0.0.1:7890

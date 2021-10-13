@@ -1,0 +1,1 @@
+adb pull /storage/emulated/0/spi.quick.plog ./spi.quick.plog

@@ -1,0 +1,14 @@
+使用说明：
+UploadServer.py：
+1、先通过配置文件server_config.json文件指定"服务程序的IP地址与端口"。（用户需要自行保证该地址能被客户端访问）
+2、双击UploadServer.py，会启动一个接收指定文件的服务程序。
+3、接收的文件会在当前目录下，以<tag>_<文件上传时间>.txt命名保存在服务器
+
+UploadClient.py：
+1、先通过配置文件client_config.json文件指定"服务程序的IP地址与端口"及"需要上传的文件的路径"
+2、双击UploadClient.py，会启动程序把指定的文件上传到服务器
+
+
+当前特性：
+UploadClient支持上传指定文件到服务器
+DownloadClient支持从服务器提取指定文件
