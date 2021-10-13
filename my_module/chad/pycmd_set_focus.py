@@ -4,11 +4,7 @@ import psutil
 import win32gui,win32process,win32con,win32com.client
 from ctypes import CDLL
 import sys
-import os
 
-def cmd_set_focus(target_pocess):
-    os.system('pycmd_set_focus.py {}'.format(target_pocess))
-    
 class Focus():
     def __init__(self):
         self.gamename=''
