@@ -35,5 +35,5 @@ if __name__=='__main__':
     btn2.pack()
     
     print('exit')
-    # chad.Cmd().set_focus()
+    chad.Cmd().set_focus('chrome.exe')
     # win.mainloop()
