@@ -9,8 +9,8 @@ def set_focus_solution2(target):
     os.popen('pycmd_set_focus.py {}'.format(target))
 
 class Cmd:
-    @classmethod
-    def set_focus(cls,target='pythonw.exe',method=''):
+    @staticmethod
+    def set_focus(target='pythonw.exe',method=''):
         if method=='silent':
             set_focus_solution2(target)
         else:
