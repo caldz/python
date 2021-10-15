@@ -35,5 +35,6 @@ if __name__=='__main__':
     btn2.pack()
     
     print('exit')
-    chad.Cmd().set_focus('chrome.exe')
-    # win.mainloop()
+    # chad.Cmd().set_focus('pythonw.exe')
+    # os.system('pycmd_set_focus.py pythonw.exe')
+    win.mainloop()

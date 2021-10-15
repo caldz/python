@@ -15,5 +15,9 @@ class Cmd:
             set_focus_solution2(target)
         else:
             set_focus_solution1(target)
+
         
         
+if __name__=='__main__':
+    Cmd().set_focus(target='chrome.exe')
+    
