@@ -10,7 +10,8 @@ def get_com_list():
     return port_list
 
 def always_recv_com():
-    s=Serial(port='COM3',baudrate=115200,timeout=None)
+    s=Serial(port='COM14',baudrate=115200,timeout=None)
+    s.write(bytes('hello',encoding='utf-8'))
     while True:
         data=s.read()
         s1=str(data,encoding='utf-8')
