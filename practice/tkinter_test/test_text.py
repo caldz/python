@@ -10,7 +10,6 @@ if __name__=='__main__':
     scroll.config(command=text.yview)
     text.config(yscrollcommand=scroll.set)
     help(text.config)
-    text.config(wrap=tkinter.WORD)
     text.insert('insert','1111')
     text.insert('end','3333')
     text.insert('0.0','2222')
