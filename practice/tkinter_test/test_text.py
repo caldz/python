@@ -1,9 +1,8 @@
 import tkinter
-import re
 
-def text_key_event(e,text):
+def text_key_event(e):
     if e.keycode==13:
-        last_line=text.get('end-1l','end')
+        last_line=e.widget.get('end-1l','end')
         line_cmd=last_line.strip()
         if line_cmd!='':
             print(line_cmd)
@@ -19,16 +18,16 @@ if __name__=='__main__':
 
 
     text=tkinter.Text(win)
-    text.bind('<Key>',lambda e:text_key_event(e,text))
-    scroll=tkinter.Scrollbar()
+    text.bind('<Key>',lambda e:text_key_event(e))
+    scrollbar=tkinter.Scrollbar()
         
     #关联滚动条和文字框
-    scroll.config(command=text.yview)
-    text.config(yscrollcommand=scroll.set)
+    scrollbar.config(command=text.yview)
+    text.config(yscrollcommand=scrollbar.set)
     
     
     #布局滚动条和文字框
-    scroll.pack(side=tkinter.RIGHT,fill=tkinter.Y)
+    scrollbar.pack(side=tkinter.RIGHT,fill=tkinter.Y)
     text.pack()
     
     for i in range(20):
