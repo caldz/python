@@ -4,7 +4,7 @@ import _thread
 import tkinter
 import time
 
-#sun function
+#sub function
 def win_key_event(e):
     if e.keycode==27:
         e.widget.quit()
@@ -15,19 +15,25 @@ def text_key_event(e,s):
         line_cmd=last_line.strip()
         if line_cmd!='':
             line_cmd='{}\0'.format(line_cmd)
-            # print(bytes(line_cmd,encoding='utf-8'))
             s.write(bytes(line_cmd,encoding='utf-8'))
 
 def click_btn1(e,s,var):
-    s.write(bytes(var.get(),encoding='utf-8'))
+    if var.get()!='':
+        s.write(bytes(var.get(),encoding='utf-8'))
+        var.set('')
 
 def text_serial_recv_thread(s,text):
     while True:
         data_bytes=s.read()
         data_str=str(data_bytes,encoding='utf-8')
-        # print(data_str,end='')
+        text.configure(state='normal')
         text.insert('end',data_str)
+        text.configure(state='disabled')
         text.see('end')
+
+def entry_key_event(e,sc):
+    if e.keycode==13:
+        click_btn1(None,sc.s,sc.var)
 
 class FakeSerial():
     def __init__(self,port='COM14',baudrate=115200,timeout=None):
@@ -41,7 +47,8 @@ class FakeSerial():
 class SerialConsole():
     def __base_config(self):
         # 选择UI模式:['sep':分离输入框和显示框,else:合并输入框和显示框]
-        self.input_mode=''
+        self.input_mode='sep'
+        self.debug_mode='on'
     def __create_ui(self):
         self.scrollbar=tkinter.Scrollbar()
         self.text=tkinter.Text(self.top)
@@ -49,12 +56,18 @@ class SerialConsole():
             self.var=tkinter.Variable()
             self.entry=tkinter.Entry(self.top,textvariable=self.var)
             self.button=tkinter.Button(self.top,text='发送')
+    def __ui_config(self):
+        self.text.configure(state='disabled')
     def __init__(self,top,port):
         self.__base_config()
         self.top=top
-        # self.s=serial.Serial(port=port,baudrate=115200,timeout=None)
-        self.s=FakeSerial(port=port,baudrate=115200,timeout=None)
+        if self.debug_mode=='on':
+            self.s=FakeSerial(port=port,baudrate=115200,timeout=None)
+        else:
+            self.s=serial.Serial(port=port,baudrate=115200,timeout=None)
+        
         self.__create_ui()
+        self.__ui_config()
         self.__bind_ui()
         _thread.start_new_thread(text_serial_recv_thread,(self.s,self.text))
     
@@ -66,6 +79,7 @@ class SerialConsole():
         self.text.config(yscrollcommand=self.scrollbar.set)
         if self.input_mode=='sep':
             self.button.bind('<Button-1>',lambda e:click_btn1(e,self.s,self.var))
+            self.entry.bind('<Key>',lambda e:entry_key_event(e,self))
         
     def pack(self):
         self.scrollbar.pack(side=tkinter.RIGHT,fill=tkinter.Y)
