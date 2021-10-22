@@ -48,7 +48,7 @@ class SerialConsole():
     def __base_config(self):
         # 选择UI模式:['sep':分离输入框和显示框,else:合并输入框和显示框]
         self.input_mode='sep'
-        self.debug_mode='on'
+        self.debug_mode=''
     def __create_ui(self):
         self.scrollbar=tkinter.Scrollbar()
         self.text=tkinter.Text(self.top)
