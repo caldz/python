@@ -6,6 +6,7 @@ class VendingMahcine():
     def ui_init(self,top):
         self.item_area=tkinter.Frame(top)
         self.item_btn_list=[]
+        self.item_btn_list.append(tkinter.Button(self.item_area,))
         i=0
         while i<4:
             item_btn=tkinter.Button(self.item_area)
@@ -14,10 +15,8 @@ class VendingMahcine():
         # help(self.item_btn_list[0].grid)
         self.dispense_area=tkinter.Frame(top)
         
-        i=0
-        for item_btn in self.item_btn_list:
-            item_btn.grid(column=i,row=0)
-            i+=1
+        btn_list=self.btn_list
+        btn_list[0].pack('')
     def __init__(self,top):
         self.ui_init(top)
     def run(self):
