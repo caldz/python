@@ -1,0 +1,7 @@
+#本文件用来设置工程GIT屏蔽文件
+.svn
+__pycache__/
+.idea/
+build/
+dist
+*.pth
