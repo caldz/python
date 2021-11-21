@@ -3,5 +3,5 @@
 __pycache__/
 .idea/
 build/
-dist
+dist/
 *.pth
