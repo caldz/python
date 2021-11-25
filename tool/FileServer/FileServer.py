@@ -10,11 +10,6 @@ class FileServerHandler(tcp_server_template.ServerHandlerTemplate):
         super().__init__(request,client_address,server)
     def setup(self):
         super().setup()
-        # self.file_name = './{}_{}-{}.txt'.format(\
-            # self.client_address[0], 
-            # self.client_address[1],
-            # time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())\
-        # )
         self.file_name = './{}##{}.txt'.format(\
             self.client_address, 
             time.strftime("(%Y-%m-%d_%H-%M-%S)", time.localtime())\
