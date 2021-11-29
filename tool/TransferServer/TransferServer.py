@@ -110,7 +110,8 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
         self.proc_main(data)
 
 if __name__ == '__main__':
-    server_ip='172.16.24.5'
+    # server_ip='172.16.24.5'
+    server_ip='192.168.0.102'
     server_port=9999
     tcp_server_template.run_server(server_ip,server_port,TranferServerHandler)
     print('exit')
