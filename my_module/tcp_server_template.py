@@ -10,10 +10,6 @@ def run_server(server_ip, server_port,handler):
     threading.Thread(target=server.serve_forever, name="server").start()
     while True:
         cmd = input('')
-        # if cmd.strip() == "quit":
-            # server.shutdown()
-            # server.server_close()
-            # break
         logging.info(threading.enumerate())
     
 class ServerHandlerTemplate(socketserver.BaseRequestHandler):
