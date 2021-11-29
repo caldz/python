@@ -11,8 +11,8 @@ class FileServerHandler(tcp_server_template.ServerHandlerTemplate):
     def setup(self):
         super().setup()
         self.file_name = './{}##{}.txt'.format(\
-            self.client_address, 
-            time.strftime("(%Y-%m-%d_%H-%M-%S)", time.localtime())\
+            time.strftime("(%Y-%m-%d_%H-%M-%S)", time.localtime()),
+            self.client_address,
         )
         self.file_is_created=False
     def finish(self):
