@@ -123,7 +123,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
     
 
 if __name__ == '__main__':
-    addr=('172.16.24.5',9999)
-    # addr=('192.168.0.102',9999)
+    # addr=('172.16.24.5',9999)
+    addr=('192.168.0.102',9999)
     tcp_server_template.run_server(addr[0],addr[1],TranferServerHandler)
     print('exit')

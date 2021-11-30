@@ -12,29 +12,38 @@ class LcRoute:
     def __init__(self):
         self.sock=None
         self.real_address=None
-
+def lc_routes_get_lcr_by_addr(lc_routes,addr):
+    for lcr in lc_routes:
+        if lcr.real_address==addr:
+            return lcr
+    return None
 class LocalComponent:
     
     def __init__(self,target_server_address):
         self.lc_routes=set()
         self.transfer_server_addr=None
         self.target_server_addr=target_server_address
+    
+            
     def proc_cmd_connect(self,dict_data):
-        print('todo connect')
+        print('todo connect', dict_data['client_address'])
         lcr=LcRoute()
         lcr.sock=socket(AF_INET,SOCK_STREAM)
         lcr.sock.connect(self.target_server_addr)
         lcr.real_address=dict_data['client_address']
+        print(lcr.real_address)
         self.lc_routes.add(lcr)
     def proc_cmd_disconnect(self,dict_data):
-        print('todo disconnect')
-        for lcr in self.lc_routes:
-            print(lcr.real_address, lcr.sock)
+        print('todo disconnect', dict_data['client_address'])
+        lcr=lc_routes_get_lcr_by_addr(self.lc_routes,dict_data['client_address'])
+        lcr.sock.close()
+        self.lc_routes.remove(lcr)
     def proc_cmd_send(self,dict_data):
         print('todo send')
         str_base64_data=dict_data['base64_data']
         data=base64.b64decode(str_base64_data)
-        print(data)
+        lcr=lc_routes_get_lcr_by_addr(self.lc_routes,dict_data['client_address'])
+        lcr.sock.send(data)
     def proc_parse_data(self,dict_data):
         print(dict_data)
         cmd=dict_data
@@ -62,6 +71,7 @@ class LocalComponent:
     
     def start(self,addr):
         try:
+            print(addr)
             sock=socket(AF_INET,SOCK_STREAM)
             sock.connect(addr)
             tcpsock_send_dict_data(sock,{'cmd':'reg'})
@@ -85,10 +95,12 @@ class LocalComponent:
 
 if __name__ == '__main__':
     print('in')
-    # transfer_server_addr=('1.13.3.108',9999)
-    transfer_server_addr=('172.16.24.5',9999)
-    target_server_address=('172.16.24.5',12345)
+    # server_ip='172.16.24.5'
+    # server_ip='192.168.0.102'
+    server_ip='1.13.3.108'
+    transfer_server_address=(server_ip,9999)
+    target_server_address=(server_ip,12345)
     lc=LocalComponent(target_server_address)
-    lc.start(transfer_server_addr)
+    lc.start(transfer_server_address)
     input()
     print('exit')
