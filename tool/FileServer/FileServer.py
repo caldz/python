@@ -26,6 +26,6 @@ class FileServerHandler(tcp_server_template.ServerHandlerTemplate):
         self.file.write(data)
 
 if __name__ == '__main__':
-    server_address=('172.16.24.5',9999)
+    server_address=('172.16.24.5',12345)
     tcp_server_template.run_tcp_server(server_address,FileServerHandler)
     print('exit')

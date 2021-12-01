@@ -1,8 +1,9 @@
 from socket import *
 import sys,json,base64
 import tcp_server_template
-import _thread
+import _thread,logging
 import traceback
+logging.basicConfig(format="Time[%(asctime)s] %(threadName)s[%(thread)d]: %(message)s", stream=sys.stdout, level=logging.INFO)
     
 def tcpsock_send_dict_data(tcpsock,dict_data):
     json_str=json.dumps(dict_data)
@@ -17,6 +18,19 @@ def lc_routes_get_lcr_by_addr(lc_routes,addr):
         if lcr.real_address==addr:
             return lcr
     return None
+
+def handler_sub_client_recv_data(lcr):
+    logging.info('in')
+    sock=lcr.sock
+    while True:
+        try:
+            recv_data=sock.recv(8092)
+            data_str=recv_data.decode('utf-8')
+            logging.info(data_str)
+        except:
+            break
+    logging.info('exit')
+
 class LocalComponent:
     
     def __init__(self,target_server_address):
@@ -31,8 +45,8 @@ class LocalComponent:
         lcr.sock=socket(AF_INET,SOCK_STREAM)
         lcr.sock.connect(self.target_server_addr)
         lcr.real_address=dict_data['client_address']
-        print(lcr.real_address)
         self.lc_routes.add(lcr)
+        _thread.start_new_thread(handler_sub_client_recv_data,(lcr,))
     def proc_cmd_disconnect(self,dict_data):
         print('todo disconnect', dict_data['client_address'])
         lcr=lc_routes_get_lcr_by_addr(self.lc_routes,dict_data['client_address'])
@@ -56,8 +70,8 @@ class LocalComponent:
                 self.proc_cmd_send(dict_data)
         except:
             traceback.print_exc()
-            
-    def handler_recv_data(self):
+        
+    def handler_main_client_recv_data(self):
         sock=self.sock
         while True:
             try:
@@ -77,7 +91,7 @@ class LocalComponent:
             tcpsock_send_dict_data(sock,{'cmd':'reg'})
             self.sock=sock
             self.transfer_server_addr=addr
-            _thread.start_new_thread(self.handler_recv_data,())
+            _thread.start_new_thread(self.handler_main_client_recv_data,())
         except:
             traceback.print_exc()
     
@@ -99,7 +113,7 @@ if __name__ == '__main__':
     # server_ip='192.168.0.102'
     server_ip='1.13.3.108'
     transfer_server_address=(server_ip,9999)
-    target_server_address=(server_ip,12345)
+    target_server_address=('172.16.24.5',12345)
     lc=LocalComponent(target_server_address)
     lc.start(transfer_server_address)
     input()

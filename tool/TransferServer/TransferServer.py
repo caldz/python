@@ -24,6 +24,11 @@ class Cmd:
             return {Cmd.tag_cmd:'sc_send'}
 
 
+class Client:
+    def __init__(self):
+        self.addr
+        self.sock
+
 class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
     class MyData:
         sm_stat='wait_reg'
@@ -60,6 +65,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
 
     def __init__(self,request,client_address,server):
         self.set_timeout_s(10)
+        self.clients=set()
         super().__init__(request,client_address,server)
         
     def setup(self):
@@ -87,7 +93,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             
     def proc_transfer(self,data):
         if self in self.mdl():
-            self.proc_sub_client_recv_data(data)
+            self.proc_sub_client_send_data(data)
         
     def proc_recv_data(self,data):
         if self.mds()=='wait_reg':
@@ -103,7 +109,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             elif self in self.mdl():
                 self.proc_sub_client_disconnect()
     
-    def proc_sub_client_recv_data(self,data):
+    def proc_sub_client_send_data(self,data):
         try:
             dict_data=Cmd.Subclient.send()
             dict_data['base64_data']=str(base64.b64encode(data),encoding='utf-8')
