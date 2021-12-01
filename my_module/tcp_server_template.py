@@ -11,6 +11,14 @@ def run_server(server_ip, server_port,handler):
     while True:
         cmd = input('')
         logging.info(threading.enumerate())
+
+def run_tcp_server(addr,handler):
+    logging.info('start server>>>')
+    server=socketserver.ThreadingTCPServer(addr,handler)
+    threading.Thread(target=server.serve_forever, name="server").start()
+    while True:
+        cmd = input('')
+        logging.info(threading.enumerate())
     
 class ServerHandlerTemplate(socketserver.BaseRequestHandler):
     timeout_s=10
