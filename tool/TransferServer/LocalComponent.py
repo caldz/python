@@ -4,6 +4,21 @@ import tcp_server_template
 import _thread,logging
 import traceback
 logging.basicConfig(format="Time[%(asctime)s] %(threadName)s[%(thread)d]: %(message)s", stream=sys.stdout, level=logging.INFO)
+
+class Cmd:
+    tag_cmd='cmd'
+    class MainClient:
+        def reg_ok():
+            return {Cmd.tag_cmd:'sm_reg_ok'}
+    class SubClient:
+        def connect():
+            return {Cmd.tag_cmd:'sc_connect'}
+        def disconnect():
+            return {Cmd.tag_cmd:'sc_disconnect'}
+        def send():
+            return {Cmd.tag_cmd:'sc_send'}
+        def recv():
+            return {Cmd.tag_cmd:'sc_recv'}
     
 def tcpsock_send_dict_data(tcpsock,dict_data):
     json_str=json.dumps(dict_data)
@@ -24,10 +39,15 @@ def handler_sub_client_recv_data(lcr):
     sock=lcr.sock
     while True:
         try:
-            recv_data=sock.recv(8092)
-            data_str=recv_data.decode('utf-8')
-            logging.info(data_str)
+            data=sock.recv(8092)
+            dict_data=Cmd.SubClient.send()
+            dict_data['base64_data']=str(base64.b64encode(data),encoding='utf-8')
+            dict_data['client_address']=lcr.real_address
+            json_str=json.dumps(dict_data)
+            sock.send(json_str.encode(encoding='utf-8'))
+            print(dict_data)
         except:
+            traceback.print_exc()
             break
     logging.info('exit')
 

@@ -15,7 +15,7 @@ class Cmd:
     class MainClient:
         def reg_ok():
             return {Cmd.tag_cmd:'sm_reg_ok'}
-    class Subclient:
+    class SubClient:
         def connect():
             return {Cmd.tag_cmd:'sc_connect'}
         def disconnect():
@@ -72,7 +72,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
         super().setup() 
         if self.mds()=='transfer':
             try:
-                self.send_tcp_data_by_dict(Cmd.Subclient.connect())
+                self.send_tcp_data_by_dict(Cmd.SubClient.connect())
                 self.mdl().add(self)
                 self.print_mdl()
             except:
@@ -111,7 +111,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
     
     def proc_sub_client_send_data(self,data):
         try:
-            dict_data=Cmd.Subclient.send()
+            dict_data=Cmd.SubClient.send()
             dict_data['base64_data']=str(base64.b64encode(data),encoding='utf-8')
             self.send_tcp_data_by_dict(dict_data)
         except:
@@ -122,7 +122,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
         print('Finish Transfer=============')
         
     def proc_sub_client_disconnect(self):
-        self.send_tcp_data_by_dict(Cmd.Subclient.disconnect())
+        self.send_tcp_data_by_dict(Cmd.SubClient.disconnect())
         self.mdl().remove(self)
         self.print_mdl()
             
