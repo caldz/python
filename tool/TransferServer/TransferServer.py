@@ -53,6 +53,13 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
         TranferServerHandler.reg_socket_data.handler=handler
 
     # 简化函数-函数
+    def mdl_get_client(self,client_address):
+        for client in self.mdl():
+            print(client_address, client.client_address)
+            if client_address==client.client_address:
+                return client
+        return None
+        
     def send_tcp_data_by_dict(self,dict_data):
         dict_data['client_address']=self.client_address
         json_str=json.dumps(dict_data)
@@ -66,7 +73,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             # print(a)
 
     def __init__(self,request,client_address,server):
-        self.set_timeout_s(10)
+        self.set_timeout_s(60)
         self.clients=set()
         super().__init__(request,client_address,server)
         
@@ -94,6 +101,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             self.request.close()
             
     def proc_transfer(self,data):
+        print(self.client_address,self.mda())
         if self in self.mdl():
             self.proc_sub_client_send_data(data)
         elif self.client_address==self.mda():
@@ -110,7 +118,6 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
         if self.mds()=='transfer':
             if self.client_address==self.mda():
                 self.proc_main_client_disconnect()
-            elif self in self.mdl():
                 self.proc_sub_client_disconnect()
     
     def proc_sub_client_send_data(self,data):
@@ -122,7 +129,12 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             perr('')
     def proc_main_client_send_data(self,data):
         try:
-            print(data)
+            dict_data=json.loads(str(data,encoding='utf-8'))
+            if dict_data['cmd']=='sc_recv':
+                data=base64.b64decode(dict_data['base64_data'])
+                client_address=tuple(dict_data['client_address'])
+                client=self.mdl_get_client(client_address)
+                client.request.send(data)
         except:
             perr('')
     def proc_main_client_disconnect(self):
@@ -143,3 +155,5 @@ if __name__ == '__main__':
     tcp_server_template.run_tcp_server(addr,TranferServerHandler)
     print('exit')
     input()
+    
+    

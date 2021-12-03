@@ -34,23 +34,6 @@ def lc_routes_get_lcr_by_addr(lc_routes,addr):
             return lcr
     return None
 
-def handler_sub_client_recv_data(lcr):
-    logging.info('in')
-    sock=lcr.sock
-    while True:
-        try:
-            data=sock.recv(8092)
-            dict_data=Cmd.SubClient.send()
-            dict_data['base64_data']=str(base64.b64encode(data),encoding='utf-8')
-            dict_data['client_address']=lcr.real_address
-            json_str=json.dumps(dict_data)
-            sock.send(json_str.encode(encoding='utf-8'))
-            print(dict_data)
-        except:
-            traceback.print_exc()
-            break
-    logging.info('exit')
-
 class LocalComponent:
     
     def __init__(self,target_server_address):
@@ -66,7 +49,7 @@ class LocalComponent:
         lcr.sock.connect(self.target_server_addr)
         lcr.real_address=dict_data['client_address']
         self.lc_routes.add(lcr)
-        _thread.start_new_thread(handler_sub_client_recv_data,(lcr,))
+        _thread.start_new_thread(self.handler_sub_client_recv_data,(lcr,))
     def proc_cmd_disconnect(self,dict_data):
         print('todo disconnect', dict_data['client_address'])
         lcr=lc_routes_get_lcr_by_addr(self.lc_routes,dict_data['client_address'])
@@ -102,6 +85,22 @@ class LocalComponent:
             except:
                 traceback.print_exc()
                 break
+    def handler_sub_client_recv_data(self,lcr):
+        logging.info('in')
+        sock=lcr.sock
+        while True:
+            try:
+                data=sock.recv(8092)
+                dict_data=Cmd.SubClient.recv()
+                dict_data['base64_data']=str(base64.b64encode(data),encoding='utf-8')
+                dict_data['client_address']=lcr.real_address
+                json_str=json.dumps(dict_data)
+                self.sock.send(json_str.encode(encoding='utf-8'))
+                print(dict_data)
+            except:
+                traceback.print_exc()
+                break
+        logging.info('exit')
     
     def start(self,addr):
         try:
@@ -139,5 +138,6 @@ if __name__ == '__main__':
     (transfer_server_address,target_server_address)=address_init_by_configure_file()
     lc=LocalComponent(target_server_address)
     lc.start(transfer_server_address)
-    input()
+    while True:
+        input()
     print('exit')
