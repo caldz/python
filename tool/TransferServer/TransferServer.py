@@ -2,8 +2,10 @@ import socketserver
 from socket import socket
 from socket import *
 import time, sys, threading, logging, json, traceback
-import tcp_server_template
 import base64
+
+import chad,tcp_server_template
+
 logging.basicConfig(format="Time[%(asctime)s] %(threadName)s[%(thread)d]: %(message)s", stream=sys.stdout, level=logging.INFO)
 
 def perr(tag):
@@ -94,6 +96,8 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
     def proc_transfer(self,data):
         if self in self.mdl():
             self.proc_sub_client_send_data(data)
+        elif self.client_address==self.mda():
+            self.proc_main_client_send_data(data)
         
     def proc_recv_data(self,data):
         if self.mds()=='wait_reg':
@@ -116,6 +120,11 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             self.send_tcp_data_by_dict(dict_data)
         except:
             perr('')
+    def proc_main_client_send_data(self,data):
+        try:
+            print(data)
+        except:
+            perr('')
     def proc_main_client_disconnect(self):
         self.mdl().clear()
         self.set_mds('wait_reg')
@@ -126,10 +135,11 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
         self.mdl().remove(self)
         self.print_mdl()
             
-    
+
 
 if __name__ == '__main__':
-    # addr=('172.16.24.5',9999)
-    addr=('192.168.0.102',9999)
-    tcp_server_template.run_server(addr[0],addr[1],TranferServerHandler)
+    addr=chad.Jreader('./server_config.plat.json').search('server_address',empval=('192.168.0.102',9999))
+    print('addr=',addr)
+    tcp_server_template.run_tcp_server(addr,TranferServerHandler)
     print('exit')
+    input()

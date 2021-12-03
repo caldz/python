@@ -1,6 +1,6 @@
 from socket import *
 import sys,json,base64
-import tcp_server_template
+import chad,tcp_server_template
 import _thread,logging
 import traceback
 logging.basicConfig(format="Time[%(asctime)s] %(threadName)s[%(thread)d]: %(message)s", stream=sys.stdout, level=logging.INFO)
@@ -126,14 +126,17 @@ class LocalComponent:
 
 
 
-
+def address_init_by_configure_file():
+    tra=chad.Jreader('./server_config.plat.json').search('server_address',\
+        empval=('1.13.3.108',9999))
+    taa=chad.Jreader('./local_component.plat.json').search('target_server_address',\
+        empval=('172.16.24.19',12345))
+    print('transfer_server_address=',tra)
+    print('target_server_address=',taa)
+    return (tra,taa)
 if __name__ == '__main__':
     print('in')
-    # server_ip='172.16.24.5'
-    # server_ip='192.168.0.102'
-    server_ip='1.13.3.108'
-    transfer_server_address=(server_ip,9999)
-    target_server_address=('172.16.24.5',12345)
+    (transfer_server_address,target_server_address)=address_init_by_configure_file()
     lc=LocalComponent(target_server_address)
     lc.start(transfer_server_address)
     input()
