@@ -28,35 +28,27 @@ class Cmd:
             return {Cmd.tag_cmd:'sc_send'}
 
 # 连接管理模块
-class Client:
+class ClientConnectionMgr:
     def __init__(self):
-        self.addr
-        self.sock
+        self.main_connection=None
+        self.state='wait_reg'
+        self.sub_connection_s=set()
+    def get_main_connection(self):
+        return self.main_connection
+    def get_sub_connection_s(self)->set:
+        return self.sub_connection_s
+    def get_state(self)->str:
+        return self.state
+    def set_main_connection(self,main_connection):
+        self.main_connection=main_connection
+    def set_state(self,state:str):
+        self.state=state
+ccm=ClientConnectionMgr()
 
 class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
-    class MyData:
-        sm_stat='wait_reg'
-        handler=None
-        client_list=set()
-    reg_socket_data=MyData()
-    
-    # 简化函数-数据
-    def mdt(self):
-        return TranferServerHandler.reg_socket_data.handler.request
-    def mda(self):
-        return TranferServerHandler.reg_socket_data.handler.client_address
-    def mds(self):
-        return TranferServerHandler.reg_socket_data.sm_stat
-    def mdl(self):
-        return TranferServerHandler.reg_socket_data.client_list
-    def set_mds(self,stat):
-        TranferServerHandler.reg_socket_data.sm_stat=stat
-    def set_mdta(self,handler):
-        TranferServerHandler.reg_socket_data.handler=handler
-
     # 简化函数-函数
     def mdl_get_client(self,client_address):
-        for client in self.mdl():
+        for client in ccm.get_sub_connection_s():
             print(client_address, client.client_address)
             if client_address==client.client_address:
                 return client
@@ -65,14 +57,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
     def send_tcp_data_by_dict(self,dict_data):
         dict_data['client_address']=self.client_address
         json_str=json.dumps(dict_data)
-        self.mdt().send(json_str.encode(encoding='utf-8'))
-        
-    # 调试函数-函数
-    def print_mdl(self):
-        pass
-        # print('---------mdl({})-----------'.format(len(self.mdl())))
-        # for a in self.mdl():
-            # print(a)
+        ccm.get_main_connection().request.send(json_str.encode(encoding='utf-8'))
 
     def __init__(self,request,client_address,server):
         self.set_timeout_s(60)
@@ -81,19 +66,18 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
         
     def setup(self):
         super().setup() 
-        if self.mds()=='transfer':
+        if ccm.get_state()=='transfer':
             try:
                 self.send_tcp_data_by_dict(Cmd.SubClient.connect())
-                self.mdl().add(self)
-                self.print_mdl()
+                ccm.get_sub_connection_s().add(self)
             except:
                 perr('disconnect')
     
     def proc_wait_reg(self,tcp_data):
         try:
             dict_data=json.loads(str(tcp_data,encoding='utf-8'))
-            self.set_mdta(self)
-            self.set_mds('transfer')
+            ccm.set_main_connection(self)
+            ccm.set_state('transfer')
             self.send_tcp_data_by_dict(Cmd.MainClient.reg_ok())
             self.request.settimeout(600)
             print('Start Transfer---------------')
@@ -103,24 +87,23 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             self.request.close()
             
     def proc_transfer(self,data):
-        if self in self.mdl():
+        if self in ccm.get_sub_connection_s():
             self.proc_sub_client_send_data(data)
-        elif self.client_address==self.mda():
+        elif self.client_address==ccm.get_main_connect().client_address:
             self.proc_main_client_send_data(data)
         
     def proc_recv_data(self,data):
-        if self.mds()=='wait_reg':
+        if ccm.get_state()=='wait_reg':
             self.proc_wait_reg(data)
-        elif self.mds()=='transfer':
+        elif ccm.get_state()=='transfer':
             self.proc_transfer(data)
     
     def finish(self):
         super().finish() 
-        print('in')
-        if self.mds()=='transfer':
-            if self.client_address==self.mda():
+        if ccm.get_state()=='transfer':
+            if self.client_address==ccm.get_main_connection().client_address:
                 self.proc_main_client_disconnect()
-            elif self in self.mdl():
+            elif self in ccm.get_sub_connection_s():
                 self.proc_sub_client_disconnect()
     
     def proc_sub_client_send_data(self,data):
@@ -141,14 +124,13 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
         except:
             perr('')
     def proc_main_client_disconnect(self):
-        self.mdl().clear()
-        self.set_mds('wait_reg')
+        ccm.get_sub_connection_s().clear()
+        ccm.set_state('wait_reg')
         print('Finish Transfer=============')
         
     def proc_sub_client_disconnect(self):
         self.send_tcp_data_by_dict(Cmd.SubClient.disconnect())
-        self.mdl().remove(self)
-        self.print_mdl()
+        ccm.get_sub_connection_s().remove(self)
             
 
 
