@@ -12,6 +12,8 @@ def perr(tag):
     traceback.print_exc()
     # print('{}, Unexpected Error:{}'.format(tag,sys.exc_info()))
 
+
+# 协议处理模块
 class Cmd:
     tag_cmd='cmd'
     class MainClient:
@@ -25,7 +27,7 @@ class Cmd:
         def send():
             return {Cmd.tag_cmd:'sc_send'}
 
-
+# 连接管理模块
 class Client:
     def __init__(self):
         self.addr
@@ -101,7 +103,6 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             self.request.close()
             
     def proc_transfer(self,data):
-        print(self.client_address,self.mda())
         if self in self.mdl():
             self.proc_sub_client_send_data(data)
         elif self.client_address==self.mda():
@@ -115,9 +116,11 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
     
     def finish(self):
         super().finish() 
+        print('in')
         if self.mds()=='transfer':
             if self.client_address==self.mda():
                 self.proc_main_client_disconnect()
+            elif self in self.mdl():
                 self.proc_sub_client_disconnect()
     
     def proc_sub_client_send_data(self,data):
