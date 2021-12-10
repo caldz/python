@@ -51,14 +51,19 @@ def handler_recv_data_from_client_of_targer_server(self,lcr):
     while True:
         try:
             recv_data=sock.recv(8092)
+            if recv_data==b'':
+                print('target server has disconnected')
+                break
             dict_data=Cmd.SubClient.recv()
             dict_data['base64_data']=str(base64.b64encode(recv_data),encoding='utf-8')
             dict_data['client_address']=lcr.real_address
             print('make dict_data:',dict_data)
             json_str=json.dumps(dict_data)
             self.sock.send(json_str.encode(encoding='utf-8'))
+        except ConnectionAbortedError:
+            break
         except:
-            # traceback.print_exc()
+            traceback.print_exc()
             break
 
 class LocalComponent:
