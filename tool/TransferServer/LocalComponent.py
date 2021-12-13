@@ -26,6 +26,8 @@ class LocalComponent:
         self.scm=SocketClientManager(target_server_address)
         self.transfer_server_addr=None
     
+    def is_exit(self):
+        return Ture
     
     def start(self,addr):
         try:
@@ -43,14 +45,21 @@ class LocalComponent:
         timeout=10
         transfer_sock=self.transfer_sock
         inputs=[transfer_sock,]
-        while True:
+        working_flag=True
+        while working_flag:
             try:
                 read_list,write_list,error_list=select.select(inputs,[],inputs,timeout)
                 print(read_list, error_list)
                 for r in read_list:
                     recv_data=r.recv(8092)
-                    if recv_data==None:
+                    if recv_data==b'':
                         inputs.remove(r)
+                        working_flag=False
+                        if r==transfer_sock:
+                            print('disconnect from transfer server')
+                        else:
+                            print('disconnect from target server')
+                        break
                     elif transfer_sock==r:
                         # 当收到来自转发服务器的数据时
                         scm=self.scm
@@ -76,10 +85,15 @@ class LocalComponent:
                         dict_data['client_address']=scm.get_client_address_by_client_sock(r)
                         print('make dict_data:',dict_data)
                         tcpsock_send_dict_data(transfer_sock,dict_data)
-                        pass
             except:
                 traceback.print_exc()
                 break
+        # 回收所有资源
+        for sock in inputs:
+            sock.close()
+        self.working_flag=False
+        print('Component Finish')
+
         
     def proc_cmd_disconnect(self,dict_data):
         lcr=lc_routes_get_lcr_by_addr(self.lc_routes,dict_data['client_address'])
@@ -132,6 +146,8 @@ def tcpsock_send_dict_data(tcpsock,dict_data):
 
 
 
+
+
 def address_init_by_configure_file():
     tra=chad.Jreader('./server_config.plat.json').search('server_address',\
         empval=('1.13.3.108',9999))
@@ -144,7 +160,7 @@ if __name__ == '__main__':
     print('in')
     (transfer_server_address,target_server_address)=address_init_by_configure_file()
     lc=LocalComponent(target_server_address).start(transfer_server_address)
-    while True:
+    while lc.is_working():
         try:
             input()
             logging.info(threading.enumerate())

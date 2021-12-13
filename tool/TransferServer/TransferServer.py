@@ -49,7 +49,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
     # 简化函数-函数
     def mdl_get_client(self,client_address):
         for client in ccm.get_sub_connection_s():
-            print(client_address, client.client_address)
+            # print(client_address, client.client_address)
             if client_address==client.client_address:
                 return client
         return None
@@ -118,7 +118,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             perr('')
     def proc_recv_data_from_target(self,data):
         try:
-            print('recv data',data)
+            # print('recv data',data)
             dict_data=json.loads(str(data,encoding='utf-8'))
             if dict_data['cmd']=='sc_recv':
                 data=base64.b64decode(dict_data['base64_data'])
