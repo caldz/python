@@ -25,11 +25,13 @@ class LocalComponent:
     def __init__(self,target_server_address):
         self.scm=SocketClientManager(target_server_address)
         self.transfer_server_addr=None
+        self.working_flag=False
     
     def is_exit(self):
         return Ture
     
     def start(self,addr):
+        self.working_flag=True
         try:
             sock=socket(AF_INET,SOCK_STREAM)
             sock.connect(addr)
@@ -38,6 +40,7 @@ class LocalComponent:
             self.transfer_server_addr=addr
             threading.Thread(target=self.run,args=()).start()
         except:
+            self.working_flag=False
             traceback.print_exc()
         return self
  
