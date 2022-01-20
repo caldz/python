@@ -60,7 +60,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
         ccm.get_main_connection().request.send(json_str.encode(encoding='utf-8'))
 
     def __init__(self,request,client_address,server):
-        self.set_timeout_s(60)
+        self.set_timeout_s(60*60)
         self.clients=set()
         super().__init__(request,client_address,server)
         
@@ -79,7 +79,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             ccm.set_main_connection(self)
             ccm.set_state('transfer')
             self.send_tcp_data_by_dict(Cmd.MainClient.reg_ok())
-            self.request.settimeout(600)
+            self.request.settimeout(60*60)
             print('Start Transfer---------------')
         except:
             perr('err reg data from {}'.format(self.client_address))
@@ -96,6 +96,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             perr('')
         
     def proc_recv_data(self,data):
+        # print(self.client_address,': ',data)
         if ccm.get_state()=='wait_reg':
             self.proc_wait_reg(data)
         elif ccm.get_state()=='transfer':
@@ -118,15 +119,33 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             perr('')
     def proc_recv_data_from_target(self,data):
         try:
-            # print('recv data',data)
-            dict_data=json.loads(str(data,encoding='utf-8'))
-            if dict_data['cmd']=='sc_recv':
-                data=base64.b64decode(dict_data['base64_data'])
-                client_address=tuple(dict_data['client_address'])
-                client=self.mdl_get_client(client_address)
-                client.request.send(data)
+            data_len=len(data)
+            # print(data_len,':',data)
+            pack_len_size=4
+            cur_i=0
+            cur_end=0
+            while data_len>cur_end:
+                cur_end=cur_i+pack_len_size
+                pack_len_str=str(data[cur_i:cur_end],encoding='utf-8')
+                pack_len=int(pack_len_str)
+                cur_i=cur_end
+                cur_end=cur_i+pack_len
+                dict_data_str=str(data[cur_i:cur_end],encoding='utf-8')
+                dict_data=json.loads(dict_data_str)
+                if dict_data['cmd']=='sc_recv':
+                    parse_data=base64.b64decode(dict_data['base64_data'])
+                    client_address=tuple(dict_data['client_address'])
+                    client=self.mdl_get_client(client_address)
+                    client.request.send(parse_data)
+                    # print(parse_data)
+                else:
+                    print('!!!!BREAK!!!!')
+                    break
+                cur_i=cur_end
+                # print('cur_end:',cur_end,' data_len:',data_len)
         except:
-            perr('')
+            print(self.client_address,': ',data)
+            perr('##ERROR##')
     def proc_disconnect_from_from_target(self):
         ccm.get_sub_connection_s().clear()
         ccm.set_state('wait_reg')
