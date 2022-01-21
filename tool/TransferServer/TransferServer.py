@@ -60,6 +60,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
         ccm.get_main_connection().request.send(json_str.encode(encoding='utf-8'))
 
     def __init__(self,request,client_address,server):
+        self.rest_data=bytes()
         self.set_timeout_s(60*60)
         self.clients=set()
         super().__init__(request,client_address,server)
@@ -117,8 +118,12 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             self.send_tcp_data_by_dict(dict_data)
         except:
             perr('')
-    def proc_recv_data_from_target(self,data):
+    def proc_recv_data_from_target(self,new_data):
         try:
+            data=self.rest_data+new_data
+            if b''!=self.rest_data:
+                print('rest data: ',self.rest_data,', new_data:',new_data,', final data: ',data)
+            self.rest_data=b''
             data_len=len(data)
             # print(data_len,':',data)
             pack_len_size=4
@@ -126,10 +131,16 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
             cur_end=0
             while data_len>cur_end:
                 cur_end=cur_i+pack_len_size
+                if cur_end > data_len:
+                    self.rest_data=data[cur_i:]
+                    break
                 pack_len_str=str(data[cur_i:cur_end],encoding='utf-8')
                 pack_len=int(pack_len_str)
                 cur_i=cur_end
                 cur_end=cur_i+pack_len
+                if cur_end > data_len:
+                    self.rest_data=data[cur_i:]
+                    break
                 dict_data_str=str(data[cur_i:cur_end],encoding='utf-8')
                 dict_data=json.loads(dict_data_str)
                 if dict_data['cmd']=='sc_recv':
@@ -142,7 +153,7 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
                     print('!!!!BREAK!!!!')
                     break
                 cur_i=cur_end
-                # print('cur_end:',cur_end,' data_len:',data_len)
+                print('cur_end:',cur_end,', data_len:',data_len, ', rest_data: ', self.rest_data)
         except:
             print(self.client_address,': ',data)
             perr('##ERROR##')
