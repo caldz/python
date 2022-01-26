@@ -6,7 +6,6 @@ import base64
 
 import chad,tcp_server_template
 
-logging.basicConfig(format="Time[%(asctime)s] %(threadName)s[%(thread)d]: %(message)s", stream=sys.stdout, level=logging.INFO)
 
 def perr(tag):
     traceback.print_exc()
@@ -119,29 +118,26 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
         except:
             perr('')
     def proc_recv_data_from_target(self,new_data):
+        data=self.rest_data+new_data
+        self.rest_data=bytes()
         try:
-            data=self.rest_data+new_data
-            if b''!=self.rest_data:
-                print('rest data: ',self.rest_data,', new_data:',new_data,', final data: ',data)
-            self.rest_data=b''
             data_len=len(data)
             # print(data_len,':',data)
             pack_len_size=4
             cur_i=0
             cur_end=0
+            i=0
             while data_len>cur_end:
+                i+=1
                 cur_end=cur_i+pack_len_size
-                if cur_end > data_len:
-                    self.rest_data=data[cur_i:]
-                    break
-                pack_len_str=str(data[cur_i:cur_end],encoding='utf-8')
+                pack_len_str=bytes.decode(data[cur_i:cur_end])
                 pack_len=int(pack_len_str)
                 cur_i=cur_end
                 cur_end=cur_i+pack_len
-                if cur_end > data_len:
-                    self.rest_data=data[cur_i:]
+                if (data_len-cur_end) < 0:
+                    self.rest_data=data[cur_i-pack_len_size:]
                     break
-                dict_data_str=str(data[cur_i:cur_end],encoding='utf-8')
+                dict_data_str=bytes.decode(data[cur_i:cur_end])
                 dict_data=json.loads(dict_data_str)
                 if dict_data['cmd']=='sc_recv':
                     parse_data=base64.b64decode(dict_data['base64_data'])
@@ -153,10 +149,20 @@ class TranferServerHandler(tcp_server_template.ServerHandlerTemplate):
                     print('!!!!BREAK!!!!')
                     break
                 cur_i=cur_end
-                print('cur_end:',cur_end,', data_len:',data_len, ', rest_data: ', self.rest_data)
         except:
+            print('##ERROR##==========================================')
+            perr('')
             print(self.client_address,': ',data)
-            perr('##ERROR##')
+            print('dict_data_str_len:',len(dict_data_str)," ; pack_len:",pack_len)
+            print('pack_len_str:',pack_len_str)
+            print('pack_len:',pack_len,'cur_i:',cur_i,'cur_end:',cur_end,'dict_data_str:',dict_data_str)
+            print('dict_data_str_len=',len(dict_data_str))
+            print('data[cur_i:cur_end]:',data[cur_i:cur_end])
+            print('data[cur_i:]:',data[cur_i:])
+            print('cur_end-cur_i=',cur_end-cur_i)
+            print('len(data[cur_i:cur_end]):',len(data[cur_i:cur_end]))
+            print('cycle:',i)
+            print('##ERROR##-------------------------------------------')
     def proc_disconnect_from_from_target(self):
         ccm.get_sub_connection_s().clear()
         ccm.set_state('wait_reg')
