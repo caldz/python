@@ -1,0 +1,6 @@
+CREATE TABLE work_rec (
+  id text,
+  project text
+);
+INSERT INTO work_rec(id,project)
+values('1','kw-upt');
